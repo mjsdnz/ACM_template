@@ -1,0 +1,282 @@
+
+----------------------------------------
+../图论/一般图最大匹配.cpp
+
+#include <bits/stdc++.h>
+using namespace std;
+int n, m;
+const int N = 1e3 + 10;
+int fa[N];
+int dfn[N];
+int pre[N];
+int cp[N];
+vector<int> g[N];
+int vis[N];
+void add(int u, int v) { g[u].push_back(v); }
+int tim;
+int find(int x) { return x == fa[x] ? x : fa[x] = find(fa[x]); }
+int lca(int x, int y) {
+    ++tim;
+    x = find(x);
+    y = find(y);
+    while (dfn[x] != tim) {
+        dfn[x] = tim;
+        x = find(pre[cp[x]]);
+        if (y)
+            swap(x, y);
+    }
+    return x;
+}
+queue<int> q;
+void blossom(int x, int y, int w) {
+    while (find(x) != w) {
+        pre[x] = y;
+        y = cp[x];
+        if (vis[y] == 2)
+            vis[y] = 1, q.push(y);
+        if (find(x) == x)
+            fa[x] = w;
+        if (find(y) == y)
+            fa[y] = w;
+        x = pre[y];
+    }
+}
+bool work(int s) {
+    for (int i = 1; i <= n; i++)
+        fa[i] = i, vis[i] = pre[i] = 0;
+    while (!q.empty())
+        q.pop();
+    q.push(s);
+    vis[s] = 1;
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        for (auto v : g[u]) {
+            if (find(v) == find(u) || vis[v] == 2)
+                continue;
+            if (!vis[v]) {
+                vis[v] = 2;
+                pre[v] = u;
+                if (!cp[v]) {
+                    for (int now = v, las; now; now = las)
+                        las = cp[pre[now]], cp[now] = pre[now],
+                        cp[pre[now]] = now;
+                    return 1;
+                }
+                vis[cp[v]] = 1, q.push(cp[v]);
+            } else {
+                int w = lca(u, v);
+                blossom(u, v, w);
+                blossom(v, u, w);
+            }
+        }
+    }
+    return 0;
+}
+int main() {
+    int ans = 0;
+    cin >> n >> m;
+    for (int i = 1; i <= m; i++) {
+        int u, v;
+        cin >> u >> v;
+        add(u, v);
+        add(v, u);
+    }
+    for (int i = 1; i <= n; i++)
+        if (!cp[i])
+            ans += work(i);
+    cout << ans << endl;
+    for (int i = 1; i <= n; i++)
+        cout << cp[i] << " ";
+}
+
+----------------------------------------
+../basic/pai/baoli.cpp
+
+#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int a, b;
+    cin >> a >> b;
+    int ans = 0;
+    for (int i = 1; i <= a; i++)
+        ans++;
+    for (int i = 1; i <= b; i++)
+        ans++;
+    cout << ans;
+}
+
+----------------------------------------
+../basic/pai/data.cpp
+
+#include <bits/stdc++.h>
+#include <sys/timeb.h>
+using namespace std;
+int main() {
+    timeb T;
+    ftime(&T);
+    srand(T.millitm); // 获得毫秒
+    int a = rand() % 100000;
+    int b = rand() % 100000;
+    printf("%d %d\n", a, b);
+}
+
+----------------------------------------
+../basic/pai/pai.cpp
+
+#include <bits/stdc++.h>
+#include <cstdlib>
+#include <ctime>
+#include <unistd.h>
+using namespace std;
+const int time_limit = 1000;
+bool linux_work() {
+    system("./data > data.in");
+    system("./baoli < data.in > baoli.out");
+    double b = clock();
+    system("./std < data.in > std.out");
+    double e = clock();
+    double t = e - b;
+    if (system("diff baoli.out std.out")) {
+        puts("WA");
+        return 0;
+    } else if (t > time_limit) {
+        printf("TLE ,use %lf seconds\n", t / 1000.0);
+    } else
+        puts("AC");
+    return 1;
+}
+
+bool windows_work() {
+    system("data.exe > data.in");
+    system("baoli.exe < data.in > baoli.out");
+    double b = clock();
+    system("std.exe < data.in > std.out");
+    double e = clock();
+    double t = e - b;
+    if (system("fc baoli.out std.out")) {
+        puts("WA");
+        return 0;
+    } else if (t > time_limit) {
+        printf("TLE ,use %lf seconds\n", t / 1000.0);
+    } else
+        puts("AC");
+    return 1;
+}
+
+#if defined(_WIN32)
+#define work() windows_work()
+#elif defined(__linux__)
+#define work() linux_work()
+#endif
+
+int main() {
+    int T = 1000;
+    while (T--) {
+        if (!work())
+            return 0;
+    }
+}
+
+----------------------------------------
+../basic/pai/std.cpp
+
+#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int a, b;
+    cin >> a >> b;
+    cout << a + b;
+}
+
+----------------------------------------
+../数论/欧拉筛.cpp
+
+#include<iostream>
+#include<cmath>
+using namespace std;
+int e[1000],top=0,n=999;
+bool p[100000];
+void evalue()
+{
+	for(int i=2;i<=n;i++)
+	{
+		if(!p[i])
+			e[++top] = i;
+		for(int j=1 ;e[j]*i<=n;j++)
+		{
+			p[i*e[j]]=true;
+			if(i%e[j]==0)
+				break;			
+		}
+	}
+}
+int main()
+{
+	evalue();
+	return 0;
+} 
+
+----------------------------------------
+../数论/gcd.cpp
+
+int gcd(int a, int b) { return b == 0 ? a : gcd(b, a % b); }
+#include <bits/stdc++.h>
+using namespace std;
+int main() {
+    int a, b;
+    cin >> a >> b;
+    cout << gcd(a, b);
+}
+
+----------------------------------------
+../数论/exgcd.cpp
+
+#include <bits/stdc++.h>
+#define int long long
+int exgcd(int a, int b, int &x, int &y) {
+    if (b == 0) {
+        x = 1, y = 0;
+        return a;
+    }
+    int gcd = exgcd(b, a % b, x, y);
+    int now = x;
+    x = y;
+    y = now - a / b * y;
+    return gcd;
+}
+using namespace std;
+void work() {
+    int a, b, c, d, x, y;
+    cin >> a >> b >> c;
+    d = exgcd(a, b, x, y);
+    if (c % d != 0)
+        puts("-1");
+    else {
+        x *= c / d, y *= c / d;
+        int p = b / d, q = a / d, k;
+        if (x < 0)
+            k = ceil((1.0 - x) / p), x += p * k, y -= q * k;
+        else if (x >= 0)
+            k = (x - 1) / p, x -= p * k, y += q * k;
+        if (y > 0) {
+            cout << (y - 1) / q + 1 << " ";
+            cout << x << " ";
+            cout << (y - 1) % q + 1 << " ";
+            cout << x + (y - 1) / q * p << " ";
+            cout << y << " ";
+        } else {
+            cout << x << " ";
+            cout << y + q * (int)ceil((1.0 - y) / q) << " ";
+        }
+        puts("");
+    }
+}
+
+signed main() {
+    int T;
+    cin >> T;
+    while (T--) {
+        work();
+    }
+}
